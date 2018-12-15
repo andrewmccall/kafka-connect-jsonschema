@@ -664,11 +664,14 @@ public class JsonSchemaConverter extends JsonConverter {
 
                 Iterator<Map.Entry<String,JsonNode>> fields = value.fields();
                 while (fields.hasNext()) {
+
                     Map.Entry<String, JsonNode> field = fields.next();
 
                     String fieldName = shouldSanitizeFieldNames ? sanitizeFieldName(field.getKey()) : field.getKey();
 
                     Field schemaField = schema.field(fieldName);
+
+                    System.out.println("Processing " + fieldName + " as: " + schemaField.schema());
                     result.put(schemaField, convertToConnect(schemaField.schema(), field.getValue(), shouldSanitizeFieldNames));
                 }
 
