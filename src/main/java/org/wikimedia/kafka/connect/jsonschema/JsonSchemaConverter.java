@@ -66,6 +66,9 @@ import org.slf4j.LoggerFactory;
  * from the parent JsonConverter, since those methods are private there.
  */
 public class JsonSchemaConverter extends JsonConverter {
+
+    private static Logger logger = LoggerFactory.getLogger(JsonSchemaConverter.class);
+
     /**
      * Used to extract the schemaURI from each JSON value.
      */
@@ -361,7 +364,7 @@ public class JsonSchemaConverter extends JsonConverter {
             if (schemaUri == null)
                 schemaUri = topic;
             URI uri = new URI(schemaURIPrefix + schemaUri + schemaURISuffix);
-            System.out.println("URI: " + uri.toString());
+           logger.trace("URI: {}", uri.toString());
             return uri;
         }
         catch (java.net.URISyntaxException e) {
@@ -670,8 +673,8 @@ public class JsonSchemaConverter extends JsonConverter {
                     String fieldName = shouldSanitizeFieldNames ? sanitizeFieldName(field.getKey()) : field.getKey();
 
                     Field schemaField = schema.field(fieldName);
-
-                    System.out.println("Processing " + fieldName + " as: " + schemaField);
+                    if (schemaField == null)
+                        throw new DataException("Field " + fieldName + " does not exist in schema " + schema.name() );
                     result.put(schemaField, convertToConnect(schemaField.schema(), field.getValue(), shouldSanitizeFieldNames));
                 }
 
@@ -771,11 +774,7 @@ public class JsonSchemaConverter extends JsonConverter {
         if (typeConverter == null)
             throw new DataException("Unknown schema type: " + String.valueOf(schemaType));
 
-        System.out.println("typeConverter" + typeConverter + " Schema: " + schema.name() + " JSON: " + jsonValue.toString());
-
         Object converted = typeConverter.convert(schema, jsonValue, shouldSanitizeFieldNames);
-
-        System.out.println("converted.");
         if (schema != null && schema.name() != null) {
             LogicalTypeConverter logicalConverter = TO_CONNECT_LOGICAL_CONVERTERS.get(schema.name());
             if (logicalConverter != null)
