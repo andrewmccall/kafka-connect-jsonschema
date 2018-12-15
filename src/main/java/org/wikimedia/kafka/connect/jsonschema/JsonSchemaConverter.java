@@ -357,7 +357,9 @@ public class JsonSchemaConverter extends JsonConverter {
      */
     public URI getSchemaURI(String topic, JsonNode value) throws DataException {
         try {
-            return new URI(schemaURIPrefix + value.at(schemaURIPointer).textValue() + schemaURISuffix);
+            URI uri = new URI(schemaURIPrefix + value.at(schemaURIPointer).textValue() + schemaURISuffix);
+            System.out.println("URI is: " + uri.toString());
+            return uri;
         }
         catch (java.net.URISyntaxException e) {
             throw new DataException("Could not extract JSONSchema URI in field " + schemaURIPointer + " json value with prefix " + schemaURIPrefix, e);
