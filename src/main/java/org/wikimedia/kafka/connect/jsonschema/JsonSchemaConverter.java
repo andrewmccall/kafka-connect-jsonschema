@@ -771,9 +771,11 @@ public class JsonSchemaConverter extends JsonConverter {
         if (typeConverter == null)
             throw new DataException("Unknown schema type: " + String.valueOf(schemaType));
 
-        System.out.println("JSON: " + jsonValue.toString());
+        System.out.println("Schema: " + schema.name() + " JSON: " + jsonValue.toString());
 
         Object converted = typeConverter.convert(schema, jsonValue, shouldSanitizeFieldNames);
+
+        System.out.println("converted.");
         if (schema != null && schema.name() != null) {
             LogicalTypeConverter logicalConverter = TO_CONNECT_LOGICAL_CONVERTERS.get(schema.name());
             if (logicalConverter != null)
