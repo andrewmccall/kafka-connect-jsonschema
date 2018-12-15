@@ -671,7 +671,7 @@ public class JsonSchemaConverter extends JsonConverter {
 
                     Field schemaField = schema.field(fieldName);
 
-                    System.out.println("Processing " + fieldName + " as: " + schemaField.schema());
+                    System.out.println("Processing " + fieldName + " as: " + schemaField);
                     result.put(schemaField, convertToConnect(schemaField.schema(), field.getValue(), shouldSanitizeFieldNames));
                 }
 
@@ -771,7 +771,7 @@ public class JsonSchemaConverter extends JsonConverter {
         if (typeConverter == null)
             throw new DataException("Unknown schema type: " + String.valueOf(schemaType));
 
-        System.out.println("Schema: " + schema.name() + " JSON: " + jsonValue.toString());
+        System.out.println("typeConverter" + typeConverter + " Schema: " + schema.name() + " JSON: " + jsonValue.toString());
 
         Object converted = typeConverter.convert(schema, jsonValue, shouldSanitizeFieldNames);
 
