@@ -67,8 +67,6 @@ import org.slf4j.LoggerFactory;
  */
 public class JsonSchemaConverter extends JsonConverter {
 
-    private static Logger logger = LoggerFactory.getLogger(JsonSchemaConverter.class);
-
     /**
      * Used to extract the schemaURI from each JSON value.
      */
@@ -183,6 +181,10 @@ public class JsonSchemaConverter extends JsonConverter {
             connectValue  = convertToConnect(connectSchema, jsonValue, shouldSanitizeFieldNames);
             // TODO: do we want to (configurably) validate jsonValue
             // using JsonSchema with JsonSchemaFactory???
+        }
+        catch (FieldNotFoundException e) {
+            log.error("Field {} is not contained in the schema for topic {}.", e.getPath(), topic, e);
+            throw e;
         }
         catch (Exception e) {
             throw new DataException(
@@ -364,7 +366,7 @@ public class JsonSchemaConverter extends JsonConverter {
             if (schemaUri == null)
                 schemaUri = topic;
             URI uri = new URI(schemaURIPrefix + schemaUri + schemaURISuffix);
-           logger.trace("URI: {}", uri.toString());
+           log.trace("URI: {}", uri.toString());
             return uri;
         }
         catch (java.net.URISyntaxException e) {
@@ -674,8 +676,12 @@ public class JsonSchemaConverter extends JsonConverter {
 
                     Field schemaField = schema.field(fieldName);
                     if (schemaField == null)
-                        throw new DataException("Field " + fieldName + " does not exist in schema " + schema.name() );
-                    result.put(schemaField, convertToConnect(schemaField.schema(), field.getValue(), shouldSanitizeFieldNames));
+                        throw new FieldNotFoundException(fieldName);
+                    try {
+                        result.put(schemaField, convertToConnect(schemaField.schema(), field.getValue(), shouldSanitizeFieldNames));
+                    } catch (FieldNotFoundException e) {
+                        throw new FieldNotFoundException(fieldName, e);
+                    }
                 }
 
                 return result;
